@@ -14,6 +14,33 @@ class UIComposer:
         self.general_frame = customtkinter.CTkFrame(self.master)
         self.sidebar_frame = customtkinter.CTkFrame(global_instances.sidebar)
 
+        self.mouse_pos_label = customtkinter.CTkLabel(self.sidebar_frame, text='', width=200, anchor='w')
+        self.mouse_pos_label.pack(padx=2, pady=2, fill='x')
+
+        (customtkinter.CTkLabel(self.sidebar_frame, text='Archivo', anchor='w')
+         .pack(padx=2, pady=2, fill='x'))
+
+        customtkinter.CTkButton(self.sidebar_frame, text='📁 Load file').pack(padx=2, pady=2, fill='x')
+
+        (customtkinter.CTkLabel(self.sidebar_frame, text='Components', anchor='w')
+         .pack(padx=2, pady=2, fill='x'))
+
+        components_frame = customtkinter.CTkFrame(self.sidebar_frame)
+        components_frame.pack(padx=2, pady=2, fill='x')
+
+        add_detection_button = customtkinter.CTkButton(
+            components_frame, text='❏ Add detection',
+            fg_color=('#424949', '#424949'),
+            hover_color='gray',
+            text_color=('black', 'white'),
+            anchor='w'
+        )
+
+        add_detection_button.pack(padx=2, pady=2, fill='x')
+
+        self.mouse_x = 0
+        self.mouse_y = 0
+
         self.canvas = customtkinter.CTkCanvas(self.general_frame, cursor='cross')
         self.canvas.pack(padx=2, pady=2, fill='both', expand=True)
 
@@ -22,6 +49,11 @@ class UIComposer:
         pass
 
     def mouse_motion_callback(self, event):
+
+        self.mouse_x = event.x
+        self.mouse_y = event.y
+
+        self.mouse_pos_label.configure(text=f"x: {self.mouse_x} | y: {self.mouse_y}")
 
         pass
 
