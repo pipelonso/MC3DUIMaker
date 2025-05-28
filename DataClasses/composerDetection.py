@@ -16,6 +16,12 @@ class ComposerDetection:
         self.y2: int = y2
 
         self.tag: str = tag
+
+        self.on_p1: bool = False
+        self.on_p2: bool = False
+
+        self.corner_amplitude = 10
+
         self.command_name: str = command_name
 
         pass

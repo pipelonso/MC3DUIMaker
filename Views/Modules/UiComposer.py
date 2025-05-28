@@ -22,10 +22,10 @@ class UIComposer:
         self.mouse_pos_label.pack(padx=2, pady=2, fill='x')
 
         self.render_ui_image = None
-        self.detections_render_lis: list[ComposerDetection] = []
+        self.detections_render_list: list[ComposerDetection] = []
 
         det = ComposerDetection(2, 2, 100, 100, 'test', 'test')
-        self.detections_render_lis.append(det)
+        self.detections_render_list.append(det)
 
         (customtkinter.CTkLabel(self.sidebar_frame, text='Archivo', anchor='w')
          .pack(padx=2, pady=2, fill='x'))
@@ -79,6 +79,24 @@ class UIComposer:
 
         self.mouse_pos_label.configure(text=f"x: {self.mouse_x} | y: {self.mouse_y}")
 
+        for detection in self.detections_render_list:
+
+            if detection.x1 < self.mouse_x < (detection.x1 + detection.corner_amplitude):
+                # dynamic Y validation
+                detection.on_p1 = detection.y1 < self.mouse_y < (detection.y1 + detection.corner_amplitude)
+
+            else:
+                detection.on_p1 = False
+
+            if (detection.x2 - detection.corner_amplitude) < self.mouse_x < detection.x2 :
+                detection.on_p2 = (detection.y2 - detection.corner_amplitude) < self.mouse_y < detection.y2
+            else:
+                detection.on_p2 = False
+
+            pass
+
+        self.update_render()
+
         pass
 
     def show_ui(self):
@@ -93,13 +111,25 @@ class UIComposer:
 
     def update_render(self) :
 
+        self.canvas.delete('all')
+
         if self.render_ui_image is not None:
             self.canvas.create_image(0,0, image=self.render_ui_image, anchor='nw')
             self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-        for i in self.detections_render_lis:
+        for i in self.detections_render_list:
 
             self.canvas.create_rectangle(i.x1, i.y1, i.x2, i.y2, outline='red')
+            self.canvas.create_rectangle(i.x1, i.y1, i.x1 + i.corner_amplitude, i.y1 + i.corner_amplitude, outline='red')
+            self.canvas.create_rectangle(i.x2, i.y2, i.x2 - i.corner_amplitude, i.y2 - i.corner_amplitude, outline='red')
+
+            if i.on_p1:
+                self.canvas.create_rectangle(i.x1, i.y1, i.x1 + i.corner_amplitude, i.y1 + i.corner_amplitude,
+                                             outline='red', fill='red')
+
+            if i.on_p2:
+                self.canvas.create_rectangle(i.x2, i.y2, i.x2 - i.corner_amplitude, i.y2 - i.corner_amplitude,
+                                             outline='red', fill='red')
 
             pass
 
