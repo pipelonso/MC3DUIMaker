@@ -25,7 +25,9 @@ class UIComposer:
         self.detections_render_list: list[ComposerDetection] = []
 
         det = ComposerDetection(2, 2, 100, 100, 'test', 'test')
+        det2 = ComposerDetection(200, 200, 400, 400, 'test', 'test')
         self.detections_render_list.append(det)
+        self.detections_render_list.append(det2)
 
         (customtkinter.CTkLabel(self.sidebar_frame, text='Archivo', anchor='w')
          .pack(padx=2, pady=2, fill='x'))
@@ -51,6 +53,7 @@ class UIComposer:
         )
 
         add_detection_button.pack(padx=2, pady=2, fill='x')
+        self.active_point = None
 
         self.mouse_x = 0
         self.mouse_y = 0
@@ -69,6 +72,30 @@ class UIComposer:
         self.canvas.configure(xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
 
         self.canvas.bind('<Motion>', self.mouse_motion_callback)
+        self.canvas.bind('<ButtonRelease-1>', self.on_release_click)
+        self.canvas.bind('<ButtonPress-1>', self.on_canvas_click)
+
+        pass
+
+    def on_canvas_click(self, event):
+
+        for i in self.detections_render_list:
+            if self.active_point is None:
+                if i.on_p1:
+                    self.active_point = i
+                    i.anchored_p1 = True
+                if i.on_p2:
+                    self.active_point = i
+                    i.anchored_p2 = True
+
+
+    def on_release_click(self, event):
+
+        for i in self.detections_render_list:
+            i.anchored_p1 = False
+            i.anchored_p2 = False
+
+        self.active_point = None
 
         pass
 
@@ -85,11 +112,22 @@ class UIComposer:
                 # dynamic Y validation
                 detection.on_p1 = detection.y1 < self.mouse_y < (detection.y1 + detection.corner_amplitude)
 
+                if detection.anchored_p1 and self.active_point == detection:
+
+                    if detection.on_p1 and not detection.on_p2:
+                        detection.x1 = event.x - (detection.corner_amplitude / 2)
+                        detection.y1 = event.y - (detection.corner_amplitude / 2)
+
             else:
                 detection.on_p1 = False
 
             if (detection.x2 - detection.corner_amplitude) < self.mouse_x < detection.x2 :
                 detection.on_p2 = (detection.y2 - detection.corner_amplitude) < self.mouse_y < detection.y2
+
+                if detection.anchored_p2 and self.active_point == detection:
+                    detection.x2 = event.x + (detection.corner_amplitude / 2)
+                    detection.y2 = event.y + (detection.corner_amplitude / 2)
+
             else:
                 detection.on_p2 = False
 

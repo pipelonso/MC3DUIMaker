@@ -20,6 +20,9 @@ class ComposerDetection:
         self.on_p1: bool = False
         self.on_p2: bool = False
 
+        self.anchored_p1 = False
+        self.anchored_p2 = False
+
         self.corner_amplitude = 10
 
         self.command_name: str = command_name
